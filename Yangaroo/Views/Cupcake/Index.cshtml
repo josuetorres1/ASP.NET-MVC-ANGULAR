@@ -1,0 +1,184 @@
+﻿@model Yangaroo.Core.Models.CupCake 
+
+@using System.Threading
+@using System.Web.Optimization
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html class="ng-scope" ng-app="App" lang="@Thread.CurrentThread.CurrentCulture.Name">
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <meta charset="utf-8">
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8"> 
+        <title>Cupcakes</title>
+        <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap.css")" />
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        @Styles.Render("~/bundles/LayoutBundle")
+        @* ReSharper disable once WrongExpressionStatement *@
+        <script>
+            // <![CDATA[
+            function submitform(elem) {
+                
+                var localIdval = elem.form[1].id.replace('inputididpartial', ''),
+                    cupCakeName,
+                    cupCakePrice,
+                    cupCakeIngredients;
+
+                if (elem.id === 'buttonUpdate') {
+
+                    var cupCakeNameTemp = YangarooApp.post.GetProps().globalName;
+                    cupCakeName = (cupCakeNameTemp === undefined || cupCakeNameTemp === '') ? elem.form[2].id.replace('inputnameidpartial', '') : cupCakeNameTemp;
+
+                    var cupCakePriceTemp = YangarooApp.post.GetProps().globalPrice;
+                    cupCakePrice = (cupCakePriceTemp == 0) ? elem.form[3].id.replace('inputpriceidpartial', '') : cupCakePriceTemp;
+
+                    var cupCakeIngredientsTemp = YangarooApp.post.GetProps().globalIngredients;
+                    var cupCakeIngredientsTempX = '';
+
+                    var i = 3;
+                    while (elem.form[++i].localName == 'input' && elem.form[i].id.indexOf('inputingidpartial' > -1)){
+                        for (var j = 0; j < YangarooApp.post.GetProps().position.length; j++) {
+                            if (YangarooApp.post.GetProps().position[j] != i) {
+                                if (j == YangarooApp.post.GetProps().position.length - 1) {
+                                    cupCakeIngredientsTempX += (cupCakeIngredientsTempX.indexOf(elem.form[i].id.replace('inputingidpartial', '')) > -1 ? '' : elem.form[i].id.replace('inputingidpartial', '') + '.');
+                                }
+                                continue;
+                            } 
+                            else {
+                                cupCakeIngredientsTempX += (cupCakeIngredientsTempX.indexOf(cupCakeIngredientsTemp) > -1 ? '' : cupCakeIngredientsTemp);
+                            }
+                            break;
+                        }
+                    }
+                    YangarooApp.post.GetProps().position = [];
+                    cupCakeIngredients = cupCakeIngredientsTempX;
+                } else {
+                    cupCakeName = YangarooApp.post.GetProps().globalName;
+                    cupCakePrice = YangarooApp.post.GetProps().globalPrice;
+                    cupCakeIngredients = YangarooApp.post.GetProps().globalIngredients;
+                }
+
+                $('#idForm').validate({
+                    debug: true,
+                    rules: {
+                        inputname: "required",
+                        inputprice: "required"
+                    }
+                });
+
+                $('#updateCupCakeForm').validate({
+                    debug: true,
+                    rules: {
+                        inputnameUpdate: "required",
+                        inputpriceUpdate: "required"
+                    }
+                });
+
+                var url = location.origin + '/Api' + (elem.id === 'buttonSubmit' ? '@Url.Action("Post", "CupCakeApi")?id=-1&name=' : '@Url.Action("PostCupCake", "CupCakeApi")?id=' + localIdval + '&name=') + cupCakeName + '&price=' + cupCakePrice + (cupCakeIngredients.length > 0 ? '&ingredients=' + cupCakeIngredients.substr(0, cupCakeIngredients.length - 1) : '&ingredients=.');
+
+                var type = "POST",
+                    dataType = "json",
+                    contentType = "application/json; charset=utf-8";
+
+                if (elem.id === 'buttonSubmit' && $('#idForm').valid()) {
+                    
+                    $.ajax({
+                        type: type,
+                        url: url,
+                        contentType: contentType,
+                        dataType: dataType,
+                        complete: function () { 
+                            document.location.reload();
+                        }
+                    });
+                    hideModal();
+                    return;
+                }
+
+                if (elem.id === 'buttonUpdate' && $('#updateCupCakeForm').valid()) {
+
+                    $.ajax({
+                        type: type,
+                        url: url,
+                        contentType: contentType,
+                        dataType: dataType,
+                        complete: function () { 
+                            document.location.reload();
+                        }
+                    });
+                    hideModal();
+                }
+            }
+
+            function hideModal() {
+                $("div[id^='myModal']").removeClass('in').css('display', 'none');
+                $('.modal-backdrop').hide();
+            }
+            // ]]>
+        </script>
+    </head>
+    <body ng-controller="YangarooCupCakesController" class="ng-scope">
+        <div class="wrapper">
+            <div class="box">
+                <div class="row row-offcanvas row-offcanvas-left">
+                    <div class="column col-sm-12 col-xs-11" id="main">
+                        <div class="navbar navbar-blue navbar-static-top" style="text-align:center;">  
+                            <div class="navbar-header" style="height:155px; margin:0 auto; width:151px; float:none;">
+                                <a class="navbar-brand hidden-xs" style="color:white;">CupCake App</a>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <button type="button" class="btn btn-success btn-block" data-dismiss="alert" aria-hidden="true" aria-label="Close" data-toggle="modal" data-target="#myModal"><span aria-hidden="true">Add CupCake</span></button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form id="idForm" action="#">
+                                                <div class="modal-header">
+                                                    <button id="buttonCreateHideModal" name="buttonCreateHideModalName" type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="hideModal();">&times;</button> 
+                                                    <div class="panel-heading">
+                                                        <div id="newCupCakeData">
+                                                            <div class="form-group">
+                                                                <label class="col-sm-2 control-label">Name</label>
+                                                                <input id="inputnameid" required class="form-control" name="inputname" type="text" onblur="YangarooApp.post.GetName(this);" />
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-2 control-label">Price</label>
+                                                                <input id="inputpriceid" required class="form-control" name="inputprice" type="text" onblur="YangarooApp.post.GetPrice(this);" />
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <button type="button" name="inputingredients" class="btn btn-success btn-block" onclick="YangarooApp.post.AddIngredient();">Add Ingredients</button> 
+                                                            </div>
+                                                        </div> 
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" id="buttonSubmit" name="buttonSubmit" class="btn btn-primary" onclick="submitform(this);">Submit CupCake</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <nav class="collapse navbar-collapse" role="navigation">
+                            </nav>
+                        </div>
+                        <div class="padding">
+                            <div class="full col-sm-9">
+                                <div class="row" style="text-align:center;">
+                                    <div class="col-sm-7" style="margin:0 auto; float:none;">
+                                        <ng-include src="getScreen()"></ng-include> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @Scripts.Render("~/bundles/CupcakeScripts")
+    </body>
+</html>
