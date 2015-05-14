@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Yangaroo.Web")]
+[assembly: AssemblyTitle("Yangaroo.Core")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Yangaroo.Web")]
+[assembly: AssemblyProduct("Yangaroo.Core")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("178efdb1-4e5b-43a8-a320-dc5cf9857487")]
+[assembly: Guid("7959372d-299d-4d3a-9d4f-0a8bbe302a0b")]
 
 // Version information for an assembly consists of the following four values:
 //
